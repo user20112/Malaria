@@ -62,7 +62,7 @@ namespace Malaria2
             base.UnloadContent();
         }
 
-        private Player player = new Player(0);
+        private Player player;
 
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
@@ -75,9 +75,10 @@ namespace Malaria2
             SpriteSheet = new SpriteSheet(Content.Load<Texture2D>("SpriteSheet"), 16, 16);
             EntitySheet = new EntitySpriteSheet(Content.Load<Texture2D>("EntitySheet"), 2, 16);
             World = new World(1000, 1000);
+            player = new Player(0);
+            player.SetLocation(World, 300, 600);
             ScreenWidth = GraphicsDevice.Viewport.Width;
             ScreenHeight = GraphicsDevice.Viewport.Height;
-            World.Entities.Add(player);
         }
 
         /// <summary>

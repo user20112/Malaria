@@ -7,23 +7,39 @@ namespace Malaria2.Entities
 {
     internal class Player : IEntity
     {
-        public float Posx { get; set; } = 300;
-        public float Posy { get; set; } = 700;
+        public float Posx { get; set; }
+        public float Posy { get; set; }
         private int ID;
         private double CharSpeed = 20;
         private double FallSpeed = 20;
         private double CurXSpeed = 0;
         private double CurYSpeed = 0;
         private double MaxSpeed = 20;
+        private bool FaceingLeft = false;
+        public World CurWorld;
 
         public Player(int id)
         {
             ID = id;
         }
 
+        public void SetLocation(World world, int xpos, int ypos)
+        {
+            if (CurWorld != null)
+                CurWorld.Entities.Remove(this);
+            CurWorld = world;
+            Posx = xpos;
+            Posy = ypos;
+            CurWorld.Entities.Add(this);
+        }
+
         public void Draw(int x, int y, SpriteBatch g, EntitySpriteSheet sheet, float SpriteDepth)
         {
-            g.Draw(sheet.Sheet, new Rectangle(x, y, SpriteSheet.SpriteSize, SpriteSheet.SpriteSize * 2), sheet.GetSprite(ID), Color.White, 0, new Vector2(0, 0), SpriteEffects.None, SpriteDepth);
+            if (CurXSpeed > 0)
+                FaceingLeft = false;
+            if (CurXSpeed < 0)
+                FaceingLeft = true;
+            g.Draw(sheet.Sheet, new Rectangle(x, y, SpriteSheet.SpriteSize, SpriteSheet.SpriteSize * 2), sheet.GetSprite(ID), Color.White, 0, new Vector2(0, 0), FaceingLeft ? SpriteEffects.None : SpriteEffects.FlipHorizontally, SpriteDepth);
         }
 
         public void Update(GameTime gametime, ITile[] SuroundingTiles)
@@ -39,7 +55,7 @@ namespace Malaria2.Entities
             bool CanWalkRight = SuroundingTiles[5].Passable && SuroundingTiles[8].Passable;
             bool CanWalkLeft = SuroundingTiles[4].Passable && SuroundingTiles[7].Passable;
             bool CanJump = SuroundingTiles[1].Passable;
-            bool CanFall = SuroundingTiles[10].Passable;
+            bool CanFall = SuroundingTiles[10].Passable && SuroundingTiles[11].Passable;
             bool WantRight = kstate.IsKeyDown(Keys.Right) || kstate.IsKeyDown(Keys.D) || gamePadState.ThumbSticks.Left.X > 0;
             bool WantLeft = kstate.IsKeyDown(Keys.Left) || kstate.IsKeyDown(Keys.A) || gamePadState.ThumbSticks.Left.X < 0;
             bool Jump = ((kstate.IsKeyDown(Keys.Up) || kstate.IsKeyDown(Keys.W)) || kstate.IsKeyDown(Keys.Space) || gamePadState.IsButtonDown(Buttons.A) || gamePadState.ThumbSticks.Left.Y > 0) && CurYSpeed == 0;
